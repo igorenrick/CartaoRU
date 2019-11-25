@@ -41,7 +41,7 @@ const Register = ({ navigation }) => {
     const [mensagem, onChangeMensagem] = React.useState(false)
 
     handleSignInPress = () => {      
-        if (nome === '' || senha === '' || matricula === '') {
+        if (curso === '' || segundonome === '' || primeironome === '' || senha === '' || matricula === '') {
             onChangeError('Preencha ambos os campos antes de entrar.')
             onChangeMensagem(true)
         } else {
@@ -95,12 +95,16 @@ const Register = ({ navigation }) => {
                 secureTextEntry={true}
             />
 
-            <Switch
-                style={styles.switch}
-                onValueChange={isento => onChangeIsento(isento)}
-                value={isento}
-                thumbColor={'#0A84FF'}
-            />
+            <View style={{flexDirection: 'row', alignItems:'center'}}>
+              <Text style={styles.rtxtb}>Não isento</Text>
+              <Switch
+                  style={styles.switch}
+                  onValueChange={isento => onChangeIsento(isento)}
+                  value={isento}
+                  thumbColor={'#0A84FF'}
+              />
+              <Text style={styles.rtxtb}>Isento</Text>
+            </View>
 
             <TouchableHighlight style={styles.button} underlayColor={'#0972DC'} onPress={() => handleSignInPress()}>
                 <Text style={styles.text}>{"Registrar"}</Text>
@@ -173,6 +177,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#000',
   },
+  switch: {
+    marginHorizontal: 20,
+    marginVertical: 10
+  }
 });
 
 export default Register;
