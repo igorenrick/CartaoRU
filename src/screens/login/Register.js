@@ -28,6 +28,10 @@ import { StackActions } from 'react-navigation'
 
 import AsyncStorage from '@react-native-community/async-storage'
 
+import api from '../../services/api'
+const qs = require('qs')
+
+
 const screenWidth = Math.round(Dimensions.get('window').width)
 
 const Register = ({ navigation }) => {
@@ -40,13 +44,28 @@ const Register = ({ navigation }) => {
     const [error, onChangeError] = React.useState('')
     const [mensagem, onChangeMensagem] = React.useState(false)
 
-    handleSignInPress = () => {      
+    handleRegisterPress = async () => {      
         if (curso === '' || segundonome === '' || primeironome === '' || senha === '' || matricula === '') {
             onChangeError('Preencha ambos os campos antes de entrar.')
             onChangeMensagem(true)
         } else {
             try {
                 onChangeMensagem(false)
+
+                const user = {
+                  primeironome: primeironome,
+                  segundonome: segundonome,
+                  curso: curso,
+                  senha: senha,
+                  matricula: matricula,
+                  isento: isento
+                }
+
+                await api.post('/users/register', qs.stringify(user)).then(resp => {
+                        console.log('Registro realizado.')
+                    }).catch(error => {
+                        console.log('Erro: ' + error)
+                })
 
                 navigation.navigate('Login')
             } catch (_err) {
@@ -68,6 +87,7 @@ const Register = ({ navigation }) => {
                 onChangeText={matricula => onChangeMatricula(matricula)}
                 value={matricula}
                 placeholder={"Matrícula"}
+                keyboardType = 'numeric'
             />
             <TextInput
                 style={styles.input}
@@ -106,7 +126,7 @@ const Register = ({ navigation }) => {
               <Text style={styles.rtxtb}>Isento</Text>
             </View>
 
-            <TouchableHighlight style={styles.button} underlayColor={'#0972DC'} onPress={() => handleSignInPress()}>
+            <TouchableHighlight style={styles.button} underlayColor={'#0972DC'} onPress={() => handleRegisterPress()}>
                 <Text style={styles.text}>{"Registrar"}</Text>
             </TouchableHighlight>
 

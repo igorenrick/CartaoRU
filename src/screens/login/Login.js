@@ -27,23 +27,30 @@ import { StackActions } from 'react-navigation'
 
 import AsyncStorage from '@react-native-community/async-storage'
 
+import api from '../../services/api'
+
 const screenWidth = Math.round(Dimensions.get('window').width)
 
 const Login = ({ navigation }) => {
-    const [nome, onChangeNome] = React.useState('')
+    const [matricula, onChangeMatricula] = React.useState('')
     const [senha, onChangeSenha] = React.useState('')
     const [error, onChangeError] = React.useState('')
     const [mensagem, onChangeMensagem] = React.useState(false)
 
-    handleSignInPress = () => {      
-        if (nome === '' || senha === '') {
+    handleSignInPress = async () => {      
+        if (matricula === '' || senha === '') {
             onChangeError('Preencha ambos os campos antes de entrar.')
             onChangeMensagem(true)
         } else {
             try {
+                const response = await api.post('/users/login', {
+                  matricula: matricula,
+                  senha: senha,
+                })
+
                 onChangeMensagem(false)
 
-                AsyncStorage.setItem('userToken', JSON.stringify(true))
+                await AsyncStorage.setItem('userToken', JSON.stringify(response.data.token))
                 
                 const resetAction = StackActions.reset({
                     index: 0
@@ -51,7 +58,7 @@ const Login = ({ navigation }) => {
 
                 navigation.navigate('App')
             } catch (_err) {
-                onChangeError('Matrícula ou senha inválidos. Tente novamente.')
+                onChangeError('Matrícula ou senha inválidos. Tente novamente. Erro: ' + _err)
                 onChangeMensagem(true)
             }
         }
@@ -66,9 +73,10 @@ const Login = ({ navigation }) => {
 
             <TextInput
                 style={styles.input}
-                onChangeText={nome => onChangeNome(nome)}
-                value={nome}
+                onChangeText={matricula => onChangeMatricula(matricula)}
+                value={matricula}
                 placeholder={"Matricula"}
+                keyboardType = 'numeric'
             />
             <TextInput
                 style={styles.input}

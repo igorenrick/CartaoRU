@@ -34,7 +34,7 @@ class Loading extends React.Component {
 
   _bootstrapAsync = async () => {
 
-    AsyncStorage.clear()
+    //AsyncStorage.clear()
 
     const userToken = await AsyncStorage.getItem('userToken');
 

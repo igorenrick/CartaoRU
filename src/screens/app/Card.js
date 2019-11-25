@@ -6,7 +6,7 @@
  * Igor Enrick de Carvalho, 18250348.
  */
 
-import React from 'react';
+import React, { Component } from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -19,46 +19,80 @@ import {
   TouchableHighlight
 } from 'react-native';
 
+import AsyncStorage from '@react-native-community/async-storage'
 
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 
+import api from '../../services/api'
+
 const screenWidth = Math.round(Dimensions.get('window').width)
 
-const Card = ({navigation}) => {
-  return (
-    <>
-      <StatusBar backgroundColor="#FFF"  barStyle="dark-content" />
-      <SafeAreaView>
-        <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          style={styles.scrollView}>
-          <View style={styles.headerView}>
-            <Icon name="account-circle-outline" size={32} color={'#0A84FF'} />
-            <Text style={styles.nome}>Igor Enrick</Text>
-          </View>
+class Card extends Component {
+  constructor(props) {
+    super(props);
 
-          <View style={styles.cartaoView}>
-            <TouchableHighlight underlayColor={'transparent'} onPress={() => navigation.navigate('Use')}>
-              <View style={styles.cartao}>
-                <Image source={require('../../assets/img/ufsc.png')} style={styles.logoUFSC}/>
+    this.state = {
+      user: ''
+    };
+  }
 
-                <View>
-                  <Text style={styles.nomeCartao}>IGOR ENRICK DE CARVALHO</Text>
-                  <Text style={styles.cursoCartao}>Engenharia de Computação (Araranguá)</Text>
-                  <Text style={styles.matriculaCartao}>18250348</Text>
+  componentDidMount = async () => {
+    const userToken = await AsyncStorage.getItem('userToken')
+
+    const token = userToken.replace(/"/g, '')
+    
+    api.defaults.headers.common['Authorization'] = 'Bearer ' + token
+
+    console.log('userToken: ' + userToken)
+    
+    await api.get('users/me').then(res => {
+
+        console.log('Data: ' + res.data)
+        
+        this.setState({ user: res.data })
+    }).catch(error => {
+        console.log('Error: ' + error)
+    })
+}
+
+  render() {
+    return (
+      <>
+        <StatusBar backgroundColor="#FFF"  barStyle="dark-content" />
+        <SafeAreaView>
+          <ScrollView
+            contentInsetAdjustmentBehavior="automatic"
+            style={styles.scrollView}>
+            <View style={styles.headerView}>
+              <Icon name="account-circle-outline" size={32} color={'#0A84FF'} />
+              <Text style={styles.nome}>{this.state.user.primeironome}</Text>
+            </View>
+
+            <View style={styles.cartaoView}>
+              <TouchableHighlight underlayColor={'transparent'} onPress={() => this.props.navigation.navigate('Use')}>
+                <View style={styles.cartao}>
+                  <Image source={require('../../assets/img/ufsc.png')} style={styles.logoUFSC}/>
+
+                  <View>
+                    <Text style={styles.nomeCartao}>{this.state.user.primeironome + ' ' + this.state.user.segundonome}</Text>
+                    <Text style={styles.cursoCartao}>{this.state.user.curso}</Text>
+                    <Text style={styles.matriculaCartao}>{this.state.user.matricula}</Text>
+                  </View>
                 </View>
-              </View>
-            </TouchableHighlight>
-          </View>
+              </TouchableHighlight>
+            </View>
 
-          <View style={styles.atividadeView}>
-            <Text style={styles.tituloAtividade}>Últimas Atividades</Text>
-          </View>
+            <View style={styles.atividadeView}>
+              <Text style={styles.tituloAtividade}>Últimas Atividades</Text>
 
-        </ScrollView>
-      </SafeAreaView>
-    </>
-  );
+              <Text style={{fontFamily: 'Roboto-Italic', textAlign: 'center', color: '#8E8E93', marginTop: 10}}>{'Você ainda não possui nenhuma\natividade para mostrar.'}</Text>
+            </View>
+
+          </ScrollView>
+        </SafeAreaView>
+      </>
+    );
+  }
 };
 
 const styles = StyleSheet.create({
@@ -118,6 +152,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: 'center',
     marginTop: 3,
+    textTransform: 'uppercase'
   },
   cursoCartao: {
     fontFamily: 'Roboto-Regular',
