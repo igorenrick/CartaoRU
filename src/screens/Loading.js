@@ -13,51 +13,53 @@
  */
 
 import React from 'react';
+
 import {
-  SafeAreaView,
   StyleSheet,
-  ScrollView,
   View,
-  Text,
   StatusBar,
   Dimensions,
-  Image
+  Image,
+  Text
 } from 'react-native';
+
+import AsyncStorage from '@react-native-community/async-storage';
 
 const screenWidth = Math.round(Dimensions.get('window').width)
 
-const Loading: () => React$Node = () => {
-  return (
-    <View style={styles.scrollView}>
-      <StatusBar backgroundColor="#FF3B30"  barStyle="light-content" />
-      <Image source={require('../assets/img/_71832176.png')} style={styles.logoUFSC}/>
-      <View style={styles.logoView}>
-        <Image source={require('../assets/img/dish.png')} style={styles.logoApp}/>
+class Loading extends React.Component {
+  componentDidMount() {
+    this._bootstrapAsync();
+  }
+
+  _bootstrapAsync = async () => {
+
+    //AsyncStorage.clear()
+
+    const userToken = await AsyncStorage.getItem('userToken');
+
+    this.props.navigation.navigate(userToken ? 'App' : 'Login');
+  };
+  render() {
+    return (
+      <View style={styles.scrollView}>
+        <StatusBar backgroundColor="#0A84FF"  barStyle="light-content" />
+        <Image source={require('../assets/img/ufsc.png')} style={styles.logoUFSC}/>
       </View>
-    </View>
-  );
+    );
+  }
 };
 
 const styles = StyleSheet.create({
   scrollView: {
     flex: 1, 
-    justifyContent: "space-between", 
-    alignItems: "flex-start",
-    backgroundColor: "#FF3B30",
-  },
-  logoView: {
-    width: screenWidth,
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    alignItems: "flex-end",
-  },
-  logoApp: {
-    marginRight: -60,
-    marginBottom: -60,
+    justifyContent: "center", 
+    alignItems: "center",
+    backgroundColor: "#0A84FF",
   },
   logoUFSC:{
-    marginLeft: 20,
-    marginTop: 20,
+    height: 32,
+    width: 120
   },
 });
 
