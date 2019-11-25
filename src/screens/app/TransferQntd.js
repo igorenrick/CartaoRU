@@ -45,7 +45,7 @@ const TransferQntd = ({ navigation }) => {
             <Text style={styles.text}>{"Cancelar"}</Text>
           </TouchableHighlight>
 
-          <TouchableHighlight style={styles.button} underlayColor={'#83C1FF'} onPress={() => navigation.navigate('ReloadSuccess')}>
+          <TouchableHighlight style={styles.button} underlayColor={'#83C1FF'} onPress={() => navigation.navigate('TransferSuccess')}>
             <Text style={styles.text}>{"Enviar créditos"}</Text>
           </TouchableHighlight>
         </View>
