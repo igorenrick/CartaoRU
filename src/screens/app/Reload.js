@@ -6,7 +6,7 @@
  * Igor Enrick de Carvalho, 18250348.
  */
 
-import React from 'react';
+import React, { Component } from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -19,33 +19,66 @@ import {
   Dimensions
 } from 'react-native';
 
+const qs = require('qs')
+
+import api from '../../services/api'
+
 const screenWidth = Math.round(Dimensions.get('window').width)
 
-const Reload = ({ navigation }) => {
-  const [creditos, onChangeCreditos] = React.useState('')
+class Reload extends Component {
+  constructor(props) {
+    super(props);
 
-  return (
-    <>
-      <StatusBar backgroundColor="#0A84FF"  barStyle="light-content" />
-      <View style={styles.scrollView}>
+    this.state = {
+      creditos: '',
+      dono: ''
+    };
+  }
 
-        <Text style={styles.titulo}>Quantos créditos você deseja carregar?</Text>
+  recargaCreditos = async () => {
+    try {
+      const user = {
+        dono: this.state.dono, 
+        creditos: this.state.creditos
+      }
+      await api.post('reloads/new', qs.stringify(user)).then(resp => {
+              console.log('Recarga realizada.')
+          }).catch(error => {
+              console.log('Erro: ' + error)
+      })
 
-        <TextInput
-            style={styles.input}
-            onChangeText={creditos => onChangeCreditos(creditos)}
-            value={creditos}
-            keyboardType = 'numeric'
-            placeholder='Digite aqui.'
-            placeholderTextColor="#83C1FF"
-        />
+      this.props.navigation.navigate('ReloadSuccess', { creditos: this.state.creditos })
+    } catch (_err) {
+      console.log(_err)
+    }
+  }
 
-        <TouchableHighlight style={styles.button} underlayColor={'#83C1FF'} onPress={() => navigation.navigate('ReloadSuccess')}>
-          <Text style={styles.text}>{"Carregar"}</Text>
-        </TouchableHighlight>
-      </View>
-    </>
-  );
+  render() {
+    const { navigation } = this.props;
+    this.state.dono = navigation.getParam('_idDono', 'NO-ID')
+    return (
+      <>
+        <StatusBar backgroundColor="#0A84FF"  barStyle="light-content" />
+        <View style={styles.scrollView}>
+
+          <Text style={styles.titulo}>Quantos créditos você deseja carregar?</Text>
+
+          <TextInput
+              style={styles.input}
+              onChangeText={(creditos) => this.setState({creditos})}
+              value={this.state.creditos}
+              keyboardType = 'numeric'
+              placeholder='Digite aqui.'
+              placeholderTextColor="#83C1FF"
+          />
+
+          <TouchableHighlight style={styles.button} underlayColor={'#83C1FF'} onPress={this.recargaCreditos}>
+            <Text style={styles.text}>{"Carregar"}</Text>
+          </TouchableHighlight>
+        </View>
+      </>
+    );
+  }
 };
 
 const styles = StyleSheet.create({

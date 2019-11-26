@@ -6,7 +6,7 @@
  * Igor Enrick de Carvalho, 18250348.
  */
 
-import React from 'react';
+import React, { Component } from 'react';
 import {
   StyleSheet,
   View,
@@ -17,52 +17,97 @@ import {
   TextInput
 } from 'react-native';
 
+import api from '../../services/api'
+
+const qs = require('qs')
+
 const screenWidth = Math.round(Dimensions.get('window').width)
 const screenHeight = Math.round(Dimensions.get('window').height)
 
-const Transfer = ({ navigation }) => {
-  const [matricula, onChangeMatricula] = React.useState('')
-  return (
-    <>
-      <StatusBar backgroundColor="#FFF"  barStyle="dark-content" />
-        <View
-          contentInsetAdjustmentBehavior="automatic"
-          style={styles.scrollView}>
-          <View style={styles.enviarView}>
-            <Text style={styles.tituloTransferEnviar}>Enviar créditos</Text>
+class Transfer extends Component {
+  constructor(props) {
+    super(props);
 
-            <View>
-              <Text style={styles.tituloCodigoTransferEnviar}>Insira o código de usuário:</Text>
+    this.state = {
+      user: '',
+      userDestino: '',
+      matriculaDestino: '',
+      erro: false,
+      mensagem: ''
+    };
+  }
 
-              <TextInput
-                  style={styles.input}
-                  onChangeText={matricula => onChangeMatricula(matricula)}
-                  value={matricula}
-                  placeholder={"Matrícula"}
-              />
+  transfereCreditos = async () => {
+    try {
+      this.setState({erro: false})
+      const matricula = {
+        matricula: this.state.matriculaDestino
+      }
+      console.log('Oi> ' + matricula.matricula)
+      await api.post('users/find', qs.stringify(matricula)).then(res => {
+              console.log('Usuario encontrado: ' + res.data.primeironome)
+              this.setState({userDestino: res.data})
+          }).catch(error => {
+              console.log('Erro: ' + error)
+      })
+      if(this.state.userDestino != '') {
+        this.props.navigation.navigate('TransferQntd', {userDestino: this.state.userDestino, userOrigem: this.state.user})
+      } else {
+        this.setState({erro: true, mensagem: 'Usuário não encontrado.'})
+      }
+    } catch (_err) {
+      console.log(_err)
+    }
+  }
 
-              <TouchableHighlight style={styles.button} underlayColor={'#0972DC'} onPress={() => navigation.navigate('TransferQntd')}>
-                <Text style={styles.text}>{"Procurar"}</Text>
-              </TouchableHighlight>
+  render() {
+    const { navigation } = this.props;
+    this.state.user = navigation.getParam('user', 'NO-USER')
+    return (
+      <>
+        <StatusBar backgroundColor="#FFF"  barStyle="dark-content" />
+          <View
+            contentInsetAdjustmentBehavior="automatic"
+            style={styles.scrollView}>
+            <View style={styles.enviarView}>
+              <Text style={styles.tituloTransferEnviar}>Enviar créditos</Text>
+
+              <View>
+                <Text style={styles.tituloCodigoTransferEnviar}>Insira o código de usuário:</Text>
+                
+                {this.state.erro ? <Text style={styles.erro}>{this.state.mensagem}</Text> : null}
+                
+                <TextInput
+                    style={styles.input}
+                    onChangeText={(matriculaDestino) => this.setState({matriculaDestino})}
+                    value={this.state.matriculaDestino}
+                    placeholder={"Matrícula"}
+                    keyboardType = 'numeric'
+                />
+
+                <TouchableHighlight style={styles.button} underlayColor={'#0972DC'} onPress={this.transfereCreditos}>
+                  <Text style={styles.text}>{"Procurar"}</Text>
+                </TouchableHighlight>
+              </View>
+
+              <Text style={styles.infoTransferEnviar}>Para enviar para outra pessoa, solicite o código (mátricula) de usuário dela e informe no campo acima. </Text>
             </View>
 
-            <Text style={styles.infoTransferEnviar}>Para enviar para outra pessoa, solicite o código (mátricula) de usuário dela e informe no campo acima. </Text>
-          </View>
+            <View style={styles.receberView}>
+              <Text style={styles.tituloTransferReceber}>Receber créditos</Text>
 
-          <View style={styles.receberView}>
-            <Text style={styles.tituloTransferReceber}>Receber créditos</Text>
+              <View>
+                <Text style={styles.tituloCodigoTransferReceber}>Meu código de usuário:</Text>
+                <Text style={styles.codigoTransferReceber}>{this.state.user.matricula}</Text>
+              </View>
 
-            <View>
-              <Text style={styles.tituloCodigoTransferReceber}>Meu código de usuário:</Text>
-              <Text style={styles.codigoTransferReceber}>18250348</Text>
+              <Text style={styles.infoTransferReceber}>Para receber de outra pessoa, informe o seu código (matrícula) para o usuário que irá te enviar os créditos. </Text>
             </View>
-
-            <Text style={styles.infoTransferReceber}>Para receber de outra pessoa, informe o seu código (matrícula) para o usuário que irá te enviar os créditos. </Text>
+            
           </View>
-          
-        </View>
-    </>
-  );
+      </>
+    );
+  }
 };
 
 const styles = StyleSheet.create({
@@ -112,6 +157,12 @@ const styles = StyleSheet.create({
     color: '#fff',
     marginHorizontal: 20,
     textAlign: 'center'
+  },
+  erro: {
+    color: '#FF453A',
+    fontFamily: 'Roboto-Bold',
+    fontSize: 14,
+    alignSelf: 'center'
   },
   tituloCodigoTransferReceber: {
     fontFamily: 'Roboto-Regular',

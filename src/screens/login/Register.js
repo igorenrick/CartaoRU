@@ -24,10 +24,6 @@ import {
   Switch
 } from 'react-native';
 
-import { StackActions } from 'react-navigation'
-
-import AsyncStorage from '@react-native-community/async-storage'
-
 import api from '../../services/api'
 const qs = require('qs')
 

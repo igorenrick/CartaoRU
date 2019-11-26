@@ -6,7 +6,7 @@
  * Igor Enrick de Carvalho, 18250348.
  */
 
-import React from 'react';
+import React, { Component } from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -21,24 +21,35 @@ import {
 
 const screenWidth = Math.round(Dimensions.get('window').width)
 
-const TransferSuccess = ({ navigation }) => {
-  const [creditos, onChangeCreditos] = React.useState('')
+class TransferSuccess extends Component {
+  constructor(props) {
+    super(props);
 
-  return (
-    <>
-      <StatusBar backgroundColor="#0A84FF"  barStyle="light-content" />
-      <View style={styles.scrollView}>
+    this.state = {
+      userDestino: '',
+      creditos: '',
+    };
+  }
+  render() {
+    const { navigation } = this.props;
+    this.state.userDestino = navigation.getParam('userDestino', 'NO-USER')
+    this.state.creditos = navigation.getParam('creditos', 'NO-USER')
+    return (
+      <>
+        <StatusBar backgroundColor="#0A84FF"  barStyle="light-content" />
+        <View style={styles.scrollView}>
 
-        <Text style={styles.titulo}>Pronto!</Text>
+          <Text style={styles.titulo}>Pronto!</Text>
 
-        <Text style={styles.input}>Você enviou 20 créditos para Ricardo.</Text>
+          <Text style={styles.input}>Você enviou {this.state.creditos} créditos para {this.state.userDestino.primeironome}.</Text>
 
-        <TouchableHighlight style={styles.button} underlayColor={'#83C1FF'} onPress={() => navigation.navigate('Home')}>
-          <Text style={styles.text}>{"Fechar."}</Text>
-        </TouchableHighlight>
-      </View>
-    </>
-  );
+          <TouchableHighlight style={styles.button} underlayColor={'#83C1FF'} onPress={() => this.props.navigation.navigate('Home')}>
+            <Text style={styles.text}>{"Fechar"}</Text>
+          </TouchableHighlight>
+        </View>
+      </>
+    );
+  }
 };
 
 const styles = StyleSheet.create({

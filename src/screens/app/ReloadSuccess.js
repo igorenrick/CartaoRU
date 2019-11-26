@@ -6,7 +6,7 @@
  * Igor Enrick de Carvalho, 18250348.
  */
 
-import React from 'react';
+import React, { Component } from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -21,24 +21,35 @@ import {
 
 const screenWidth = Math.round(Dimensions.get('window').width)
 
-const ReloadSuccess = ({ navigation }) => {
-  const [creditos, onChangeCreditos] = React.useState('')
+class ReloadSuccess extends Component {
+  constructor(props) {
+    super(props);
 
-  return (
-    <>
-      <StatusBar backgroundColor="#0A84FF"  barStyle="light-content" />
-      <View style={styles.scrollView}>
+    this.state = {
+      creditos: '',
+    };
+  }
+  
+  render() {
+    const { navigation } = this.props;
+    this.state.creditos = navigation.getParam('creditos')
 
-        <Text style={styles.titulo}>Pronto!</Text>
+    return (
+      <>
+        <StatusBar backgroundColor="#0A84FF"  barStyle="light-content" />
+        <View style={styles.scrollView}>
 
-        <Text style={styles.input}>Você carregou 20 créditos.</Text>
+          <Text style={styles.titulo}>Pronto!</Text>
 
-        <TouchableHighlight style={styles.button} underlayColor={'#83C1FF'} onPress={() => navigation.navigate('Home')}>
-          <Text style={styles.text}>{"Obrigado."}</Text>
-        </TouchableHighlight>
-      </View>
-    </>
-  );
+          <Text style={styles.input}>Você carregou {this.state.creditos} créditos.</Text>
+
+          <TouchableHighlight style={styles.button} underlayColor={'#83C1FF'} onPress={() => this.props.navigation.navigate('Home')}>
+            <Text style={styles.text}>{"Obrigado."}</Text>
+          </TouchableHighlight>
+        </View>
+      </>
+    );
+  }
 };
 
 const styles = StyleSheet.create({

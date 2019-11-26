@@ -6,7 +6,7 @@
  * Igor Enrick de Carvalho, 18250348.
  */
 
-import React from 'react';
+import React, { Component } from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -19,39 +19,74 @@ import {
   Dimensions
 } from 'react-native';
 
+import api from '../../services/api'
+
+const qs = require('qs')
+
 const screenWidth = Math.round(Dimensions.get('window').width)
 
-const TransferQntd = ({ navigation }) => {
-  const [creditos, onChangeCreditos] = React.useState('')
+class TransferQntd extends Component {
+  constructor(props) {
+    super(props);
 
-  return (
-    <>
-      <StatusBar backgroundColor="#0A84FF"  barStyle="light-content" />
-      <View style={styles.scrollView}>
+    this.state = {
+      user: '',
+      userDestino: '',
+      creditos: '',
+    };
+  }
 
-        <Text style={styles.titulo}>Quantos créditos você deseja enviar para Ricardo?</Text>
+  confirmTransfer = async () => {
+    try {
+      const transferencia = {
+        usuarioDestino: this.state.userDestino,
+        usuarioOrigem: this.state.userOrigem,
+        creditos: this.state.creditos
+      }
 
-        <TextInput
-            style={styles.input}
-            onChangeText={creditos => onChangeCreditos(creditos)}
-            value={creditos}
-            keyboardType = 'numeric'
-            placeholder='Digite aqui.'
-            placeholderTextColor="#83C1FF"
-        />
+      await api.post('transfers/new', qs.stringify(transferencia)).then(res => {
+          this.props.navigation.navigate('TransferSuccess', {userDestino: this.state.userDestino, creditos: this.state.creditos})
+      }).catch(error => {
+          console.log('Erro: ' + error)
+      })
+    } catch (_err) {
+      console.log(_err)
+    }
+  }
 
-        <View>
-          <TouchableHighlight style={styles.button} underlayColor={'#83C1FF'} onPress={() => navigation.navigate('Transfer')}>
-            <Text style={styles.text}>{"Cancelar"}</Text>
-          </TouchableHighlight>
+  render() {
+    const { navigation } = this.props;
+    this.state.userDestino = navigation.getParam('userDestino', 'NO-USER')
+    this.state.userOrigem = navigation.getParam('userOrigem', 'NO-USER')
+    return (
+      <>
+        <StatusBar backgroundColor="#0A84FF"  barStyle="light-content" />
+        <View style={styles.scrollView}>
 
-          <TouchableHighlight style={styles.button} underlayColor={'#83C1FF'} onPress={() => navigation.navigate('TransferSuccess')}>
-            <Text style={styles.text}>{"Enviar créditos"}</Text>
-          </TouchableHighlight>
+          <Text style={styles.titulo}>Quantos créditos você deseja enviar para {this.state.userDestino.primeironome}?</Text>
+
+          <TextInput
+              style={styles.input}
+              onChangeText={(creditos) => this.setState({creditos})}
+              value={this.state.creditos}
+              keyboardType = 'numeric'
+              placeholder='Digite aqui.'
+              placeholderTextColor="#83C1FF"
+          />
+
+          <View>
+            <TouchableHighlight style={styles.button} underlayColor={'#83C1FF'} onPress={() => this.props.navigation.navigate('Transfer')}>
+              <Text style={styles.text}>{"Cancelar"}</Text>
+            </TouchableHighlight>
+
+            <TouchableHighlight style={styles.button} underlayColor={'#83C1FF'} onPress={this.confirmTransfer}>
+              <Text style={styles.text}>{"Enviar créditos"}</Text>
+            </TouchableHighlight>
+          </View>
         </View>
-      </View>
-    </>
-  );
+      </>
+    );
+  }
 };
 
 const styles = StyleSheet.create({
