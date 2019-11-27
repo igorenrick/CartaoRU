@@ -35,7 +35,9 @@ class Home extends Component {
     this.state = {
       user: '',
       cartao: '',
-      cardapio: ''
+      cardapio: '',
+      erro: false,
+      mensagem: ''
     };
   }
 
@@ -63,22 +65,23 @@ class Home extends Component {
 
     await api.post('cards/access', qs.stringify(requestBodyCard)).then(res => {
         
-        console.log('Créditos para carregar: ' + res.data.creditos )
+        console.log('Créditos: ' + res.data.creditos )
         
         this.setState({ cartao: res.data })
+
     }).catch(error => {
         console.log('Error: ' + error)
     })
 
+    console.log('BUSCA MENUS DE ALMOÇO E JANTA')
+
     const requestBodyMenu = {
-      restaurante: '5ddc60a2154f630004c30fa7',
+      local: '5ddc60a2154f630004c30fa7',
     }
 
-    await api.post('menus', qs.stringify(requestBodyMenu)).then(res => {
-        
-        console.log('Restaurante: ' + res.data.restaurante )
-        
-        this.setState({ cardapio: res.data })
+    await api.post('menus/find', qs.stringify(requestBodyMenu)).then(res => {      
+      console.log('Almoço: ' + res.data.almoco)        
+      this.setState({ cardapio: res.data })
     }).catch(error => {
         console.log('Error: ' + error)
     })
@@ -142,30 +145,33 @@ class Home extends Component {
               </View>
             </View>
 
-            <View style={styles.botoesView}>
-              <TouchableHighlight style={styles.button} underlayColor={'#D1D1D6'} onPress={()=> this.props.navigation.navigate('Transfer', { user: this.state.user})}>
-                <View style={{alignItems: 'center'}}>
-                  <Icon name="swap-horizontal" size={44} color={'#000'} />
-                  <Text style={styles.text}>{"Transferir"}</Text>
-                </View>
-              </TouchableHighlight>
+            <View style={{marginTop: 25}}>
+              {this.state.erro ? <Text style={styles.erro}>{this.state.mensagem}</Text> : null}
+              <View style={styles.botoesView}>
+                <TouchableHighlight style={styles.button} underlayColor={'#D1D1D6'} onPress={() => this.state.user.isento ? this.setState({ mensagem: 'Usuários isentos não podem transferir créditos.', erro: true}) : this.props.navigation.navigate('Transfer', { user: this.state.user})}>
+                  <View style={{alignItems: 'center'}}>
+                    <Icon name="swap-horizontal" size={44} color={this.state.user.isento ? '#AEAEB2' :'#000'} />
+                    <Text style={[styles.text, {color: this.state.user.isento ? '#AEAEB2' : '#000' }]}>{"Transferir"}</Text>
+                  </View>
+                </TouchableHighlight>
 
-              <TouchableHighlight style={styles.button} underlayColor={'#D1D1D6'} onPress={()=> this.props.navigation.navigate('Reload', { _idDono: this.state.user._id})}>
-                <View style={{alignItems: 'center'}}>
-                  <Icon name="plus-box-outline" size={42} color={'#000'} />
-                  <Text style={styles.text}>{"Recarregar"}</Text>
-                </View>
-              </TouchableHighlight>
+                <TouchableHighlight style={styles.button} underlayColor={'#D1D1D6'} onPress={() => this.state.user.isento ? this.setState({ mensagem: 'Usuários isentos não podem recarregar créditos.', erro: true}) : this.props.navigation.navigate('Reload', { _idDono: this.state.user._id})}>
+                  <View style={{alignItems: 'center'}}>
+                    <Icon name="plus-box-outline" size={42} color={this.state.user.isento ? '#AEAEB2' : '#000'} />
+                    <Text style={[styles.text, {color: this.state.user.isento ? '#AEAEB2' : '#000' }]}>{"Recarregar"}</Text>
+                  </View>
+                </TouchableHighlight>
+              </View>
             </View>
 
             <View style={styles.cardapioView}>
               <Text style={styles.tituloCardapio}>Cardápio do Dia</Text>
 
               <Text style={styles.tituloCategoriaCardapio}>ALMOÇO</Text>
-              <Text style={styles.conteudoCategoriaCardapio}>{this.state.cardapio.almoco}</Text>
+              <Text style={styles.conteudoCategoriaCardapio}>{this.state.cardapio.almoco == undefined ? 'Cardápio do almoco não disponível.' : this.state.cardapio.almoco}</Text>
 
               <Text style={styles.tituloCategoriaCardapio}>JANTA</Text>
-              <Text style={styles.conteudoCategoriaCardapio}>{this.state.cardapio.janta}</Text>
+              <Text style={styles.conteudoCategoriaCardapio}>{this.state.cardapio.janta == undefined ? 'Cardápio da janta não disponível.' : this.state.cardapio.janta}</Text>
             </View>
           </ScrollView>
         </SafeAreaView>
@@ -190,6 +196,12 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     alignItems: 'center',
     justifyContent: 'center',
+    alignSelf: 'center'
+  },
+  erro: {
+    color: '#FF453A',
+    fontFamily: 'Roboto-Bold',
+    fontSize: 14,
     alignSelf: 'center'
   },
   textheader: {
@@ -240,7 +252,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginHorizontal: 20,
-    marginTop: 25
+    marginTop: 5
   },
   button: {
     width: (screenWidth-60)/2,
@@ -253,7 +265,6 @@ const styles = StyleSheet.create({
   text: {
     fontFamily: 'Roboto-Regular',
     fontSize: 14,
-    color: '#000',
     marginTop: 10
   },
   cardapioView: {

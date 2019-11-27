@@ -16,8 +16,12 @@ import {
   StatusBar,
   Dimensions,
   Image,
-  TouchableHighlight
+  TouchableHighlight,
+  FlatList
 } from 'react-native';
+
+const qs = require('qs')
+const moment = require('moment')
 
 import AsyncStorage from '@react-native-community/async-storage'
 
@@ -32,7 +36,24 @@ class Card extends Component {
     super(props);
 
     this.state = {
-      user: ''
+      user: '',
+      tematividade: true,
+      usos: '',
+      localUsos: '',
+      recargas: '',
+      transferencias: '',
+      i: 0,
+      nomest: [
+        {
+          nome: 'Nenhum'
+        },
+        {
+          nome: 'Nenhum'
+        },
+        {
+          nome: 'Nenhum'
+        }
+      ]
     };
   }
 
@@ -44,8 +65,56 @@ class Card extends Component {
     api.defaults.headers.common['Authorization'] = 'Bearer ' + token
     
     await api.get('users/me').then(res => {
-        
         this.setState({ user: res.data })
+    }).catch(error => {
+        console.log('Error: ' + error)
+    })
+
+    //PEGA USOS
+    const requestBodyUsos = {
+      _id: this.state.user.atividade,
+    }
+
+    await api.post('activities/listuses', qs.stringify(requestBodyUsos)).then(res => {      
+      console.log('Usos: ' + res.data)
+      
+      this.setState({ usos: res.data })
+    }).catch(error => {
+        console.log('Error: ' + error)
+    })
+
+    const requestIdRestaurante = {
+      _id: this.state.usos[0].local,
+    }
+    await api.post('restaurants/find', qs.stringify(requestIdRestaurante)).then(res => {      
+      console.log('Restaurante: ' + res.data.nome)        
+      this.setState({ localUsos: res.data.nome })
+    }).catch(error => {
+        console.log('Error: ' + error)
+    })
+
+    //PEGA RECARGAS
+
+    const requestBodyRecargas = {
+      _id: this.state.user.atividade,
+    }
+
+    await api.post('activities/listreloads', qs.stringify(requestBodyRecargas)).then(res => {      
+      console.log('Recargas: ' + res.data)        
+      this.setState({ recargas: res.data })
+    }).catch(error => {
+        console.log('Error: ' + error)
+    })
+
+    //PEGA TRANSFERENCIAS
+
+    const requestBodyTransferencias = {
+      _id: this.state.user.atividade,
+    }
+
+    await api.post('activities/listtransfers', qs.stringify(requestBodyTransferencias)).then(res => {      
+      console.log('Transferências: ' + res.data)        
+      this.setState({ transferencias: res.data })
     }).catch(error => {
         console.log('Error: ' + error)
     })
@@ -97,7 +166,7 @@ class Card extends Component {
             </View>
 
             <View style={styles.cartaoView}>
-              <TouchableHighlight underlayColor={'transparent'} onPress={() => this.props.navigation.navigate('Use')}>
+              <TouchableHighlight underlayColor={'transparent'} onPress={() => this.props.navigation.navigate('Use', { user: this.state.user })}>
                 <View style={styles.cartao}>
                   <Image source={require('../../assets/img/ufsc.png')} style={styles.logoUFSC}/>
 
@@ -115,7 +184,55 @@ class Card extends Component {
             <View style={styles.atividadeView}>
               <Text style={styles.tituloAtividade}>Últimas Atividades</Text>
 
-              <Text style={{fontFamily: 'Roboto-Italic', textAlign: 'center', color: '#8E8E93', marginTop: 10}}>{'Você ainda não possui nenhuma\natividade para mostrar.'}</Text>
+              {this.state.tematividade ? null : <Text style={{fontFamily: 'Roboto-Italic', textAlign: 'center', color: '#8E8E93', marginTop: 10}}>{'Você ainda não possui nenhuma\natividade para mostrar.'}</Text>}
+              
+              <Text style={styles.titulo2Atividade}>Usos</Text>
+              
+              <FlatList 
+                data={this.state.usos}
+                renderItem={({ item }) => (
+                  <View style={{marginHorizontal: 20, marginTop: 5, marginBottom: 5}}>
+                    <Text style={{fontFamily: 'Roboto-Regular', fontSize: 12, color: '#8E8E93'}}>{moment(item.data).subtract(10, 'days').calendar()}</Text>
+                    <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                      <Text>Uso no {this.state.localUsos}</Text>
+                      <Text>{item.creditos > 1 ? item.creditos + ' créditos' : item.creditos + ' crédito'}</Text>
+                    </View>
+                  </View>
+                )}
+                keyExtractor={item => item._id}
+              /> 
+
+              <Text style={styles.titulo2Atividade}>Recargas</Text>
+
+              <FlatList 
+                data={this.state.recargas}
+                renderItem={({ item }) => (
+                  <View style={{marginHorizontal: 20, marginTop: 5, marginBottom: 5}}>
+                    <Text style={{fontFamily: 'Roboto-Regular', fontSize: 12, color: '#8E8E93'}}>{moment(item.data).subtract(10, 'days').calendar()}</Text>
+                    <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                      <Text>Recarga</Text>
+                      <Text>{item.creditos > 1 ? item.creditos + ' créditos' : item.creditos + ' crédito'}</Text>
+                    </View>
+                  </View>
+                )}
+                keyExtractor={item => item.id}
+              />
+
+              <Text style={styles.titulo2Atividade}>Transferências</Text>
+
+              <FlatList 
+                data={this.state.transferencias}
+                renderItem={({ item }) => (
+                  <View style={{marginHorizontal: 20, marginTop: 5, marginBottom: 5}}>
+                    <Text style={{fontFamily: 'Roboto-Regular', fontSize: 12, color: '#8E8E93'}}>{moment(item.data).subtract(10, 'days').calendar()}</Text>
+                    <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                      <Text>Transferência para usuário</Text>
+                      <Text>{item.creditos > 1 ? item.creditos + ' créditos' : item.creditos + ' crédito'}</Text>
+                    </View>
+                  </View>
+                )}
+                keyExtractor={item => item.id}
+              />
             </View>
 
           </ScrollView>
@@ -193,13 +310,22 @@ const styles = StyleSheet.create({
     width: 90
   },
   atividadeView: {
-    alignItems: 'center',
-    marginTop: 10
+    flex: 1,
+    marginTop: 10,
+    marginBottom: 40
   },
   tituloAtividade: {
     fontFamily: 'Roboto-Bold',
     fontSize: 20,
+    alignSelf: 'center',
     color: '#000'
+  },
+  titulo2Atividade: {
+    fontFamily: 'Roboto-Bold',
+    fontSize: 16,
+    alignSelf: 'center',
+    color: '#000',
+    marginTop: 15
   },
   nomeCartao: {
     fontFamily: 'Roboto-Bold',
