@@ -38,17 +38,20 @@ class TransferQntd extends Component {
 
   confirmTransfer = async () => {
     try {
-      const transferencia = {
-        usuarioDestino: this.state.userDestino,
-        usuarioOrigem: this.state.userOrigem,
-        creditos: this.state.creditos
-      }
+      if (this.state.creditos != '') {
+        const transferencia = {
+          usuarioDestino: this.state.userDestino,
+          usuarioOrigem: this.state.userOrigem,
+          creditos: this.state.creditos
+        }
 
-      await api.post('transfers/new', qs.stringify(transferencia)).then(res => {
-          this.props.navigation.navigate('TransferSuccess', {userDestino: this.state.userDestino, creditos: this.state.creditos})
-      }).catch(error => {
-          console.log('Erro: ' + error)
-      })
+        await api.post('transfers/new', qs.stringify(transferencia)).then(res => {
+            this.props.navigation.navigate('TransferSuccess', {userDestino: this.state.userDestino, creditos: this.state.creditos})
+        }).catch(error => {
+            console.log('Erro: ' + error)
+        })
+      }
+      this.props.navigation.navigate('TransferSuccess', {userDestino: this.state.userDestino, creditos: this.state.creditos})
     } catch (_err) {
       console.log(_err)
     }

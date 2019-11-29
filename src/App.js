@@ -24,6 +24,7 @@ import Register from './screens/login/Register'
 //Import the app screens.
 import Home from './screens/app/Home'
 import Card from './screens/app/Card'
+import Profile from './screens/app/Profile'
 import Reload from './screens/app/Reload'
 import ReloadSuccess from './screens/app/ReloadSuccess'
 import Transfer from './screens/app/Transfer'
@@ -34,6 +35,13 @@ import UseResult from './screens/app/UseResult'
 
 const BottomNavig = createBottomTabNavigator(
   {
+    Profile: {
+      screen: Profile,
+      navigationOptions: {
+        title: 'Perfil',
+        tabBarIcon: ({tintColor}) => <Icon name="account-circle-outline" size={25} color={tintColor} />
+      }
+    },
     Home: {
       screen: Home,
       navigationOptions: {

@@ -15,7 +15,8 @@ import {
   Text,
   StatusBar,
   Dimensions,
-  TouchableHighlight
+  TouchableHighlight,
+  RefreshControl
 } from 'react-native'
 
 const qs = require('qs')
@@ -33,6 +34,7 @@ class Home extends Component {
     super(props);
 
     this.state = {
+      refreshing: false,
       user: '',
       cartao: '',
       cardapio: '',
@@ -115,6 +117,13 @@ class Home extends Component {
       }
   }
 
+  _onRefresh() {
+    this.setState({refreshing: true});
+    this.componentDidMount().then(() => {
+      this.setState({refreshing: false});
+    });
+  }
+
   render() {
     return (
       <>
@@ -122,15 +131,23 @@ class Home extends Component {
         <SafeAreaView>
           <ScrollView
             contentInsetAdjustmentBehavior="automatic"
-            style={styles.scrollView}>
+            style={styles.scrollView}
+            refreshControl={
+              <RefreshControl
+                refreshing={this.state.refreshing}
+                onRefresh={this._onRefresh.bind(this)}
+              />
+            }
+            >
             <View style={styles.maxheaderView}>
               <View style={styles.headerView}>
                 <Icon name="account-circle-outline" size={32} color={'#0A84FF'} />
                 <Text style={styles.nome}>{this.state.user.primeironome}</Text>
               </View>
-              <TouchableHighlight style={styles.buttonheader} underlayColor={'#83C1FF'} onPress={this.handleSignOutPress}>
+              <View></View>
+              {/*<TouchableHighlight style={styles.buttonheader} underlayColor={'#83C1FF'} onPress={this.handleSignOutPress}>
                 <Text style={styles.textheader}>{"Sair"}</Text>
-              </TouchableHighlight>
+              </TouchableHighlight>*/}
             </View>
 
             <View style={styles.dadosView}>

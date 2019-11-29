@@ -51,7 +51,11 @@ class Transfer extends Component {
               console.log('Erro: ' + error)
       })
       if(this.state.userDestino != '') {
-        this.props.navigation.navigate('TransferQntd', {userDestino: this.state.userDestino, userOrigem: this.state.user})
+          if(!this.state.userDestino.isento) {
+            this.props.navigation.navigate('TransferQntd', {userDestino: this.state.userDestino, userOrigem: this.state.user})
+          } else {
+            this.setState({erro: true, mensagem: 'Não é possivel transferir créditos para usuários isentos.'})
+          }
       } else {
         this.setState({erro: true, mensagem: 'Usuário não encontrado.'})
       }
@@ -162,7 +166,9 @@ const styles = StyleSheet.create({
     color: '#FF453A',
     fontFamily: 'Roboto-Bold',
     fontSize: 14,
-    alignSelf: 'center'
+    alignSelf: 'center',
+    marginHorizontal: 40,
+    textAlign: 'center'
   },
   tituloCodigoTransferReceber: {
     fontFamily: 'Roboto-Regular',

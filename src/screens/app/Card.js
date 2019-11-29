@@ -17,7 +17,8 @@ import {
   Dimensions,
   Image,
   TouchableHighlight,
-  FlatList
+  FlatList,
+  RefreshControl
 } from 'react-native';
 
 const qs = require('qs')
@@ -36,6 +37,7 @@ class Card extends Component {
     super(props);
 
     this.state = {
+      refreshing: false,
       user: '',
       tematividade: true,
       usos: '',
@@ -147,6 +149,13 @@ class Card extends Component {
       }
   }
 
+  _onRefresh() {
+    this.setState({refreshing: true});
+    this.componentDidMount().then(() => {
+      this.setState({refreshing: false});
+    });
+  }
+
   render() {
     return (
       <>
@@ -154,15 +163,23 @@ class Card extends Component {
         <SafeAreaView>
           <ScrollView
             contentInsetAdjustmentBehavior="automatic"
-            style={styles.scrollView}>
+            style={styles.scrollView}
+            refreshControl={
+              <RefreshControl
+                refreshing={this.state.refreshing}
+                onRefresh={this._onRefresh.bind(this)}
+              />
+            }
+            >
             <View style={styles.maxheaderView}>
               <View style={styles.headerView}>
                 <Icon name="account-circle-outline" size={32} color={'#0A84FF'} />
                 <Text style={styles.nome}>{this.state.user.primeironome}</Text>
               </View>
-              <TouchableHighlight style={styles.buttonheader} underlayColor={'#83C1FF'} onPress={this.handleSignOutPress}>
+              <View></View>
+              {/*<TouchableHighlight style={styles.buttonheader} underlayColor={'#83C1FF'} onPress={this.handleSignOutPress}>
                 <Text style={styles.textheader}>{"Sair"}</Text>
-              </TouchableHighlight>
+              </TouchableHighlight>*/}
             </View>
 
             <View style={styles.cartaoView}>
@@ -188,7 +205,9 @@ class Card extends Component {
               
               <Text style={styles.titulo2Atividade}>Usos</Text>
               
-              <FlatList 
+              {this.state.usos == '' ? 
+                <Text style={{fontFamily: 'Roboto-Italic', textAlign: 'center', color: '#8E8E93', marginTop: 10, marginHorizontal: 40}}>{'Você ainda não possui nenhum uso para mostrar.'}</Text>
+              :<FlatList 
                 data={this.state.usos}
                 renderItem={({ item }) => (
                   <View style={{marginHorizontal: 20, marginTop: 5, marginBottom: 5}}>
@@ -200,11 +219,14 @@ class Card extends Component {
                   </View>
                 )}
                 keyExtractor={item => item._id}
-              /> 
+              />
+              }
 
               <Text style={styles.titulo2Atividade}>Recargas</Text>
 
-              <FlatList 
+              {this.state.recargas == '' ? 
+                <Text style={{fontFamily: 'Roboto-Italic', textAlign: 'center', color: '#8E8E93', marginTop: 10, marginHorizontal: 40}}>{'Você ainda não possui nenhuma recarga para mostrar.'}</Text>
+              : <FlatList 
                 data={this.state.recargas}
                 renderItem={({ item }) => (
                   <View style={{marginHorizontal: 20, marginTop: 5, marginBottom: 5}}>
@@ -215,12 +237,15 @@ class Card extends Component {
                     </View>
                   </View>
                 )}
-                keyExtractor={item => item.id}
+                keyExtractor={item => item._id}
               />
+              }
 
               <Text style={styles.titulo2Atividade}>Transferências</Text>
 
-              <FlatList 
+              {this.state.transferencias == '' ? 
+                <Text style={{fontFamily: 'Roboto-Italic', textAlign: 'center', color: '#8E8E93', marginTop: 10, marginHorizontal: 40}}>{'Você ainda não possui nenhuma transferência para mostrar.'}</Text>
+              : <FlatList 
                 data={this.state.transferencias}
                 renderItem={({ item }) => (
                   <View style={{marginHorizontal: 20, marginTop: 5, marginBottom: 5}}>
@@ -231,8 +256,9 @@ class Card extends Component {
                     </View>
                   </View>
                 )}
-                keyExtractor={item => item.id}
+                keyExtractor={item => item._id}
               />
+              }
             </View>
 
           </ScrollView>

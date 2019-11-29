@@ -37,15 +37,17 @@ class Reload extends Component {
 
   recargaCreditos = async () => {
     try {
-      const user = {
-        dono: this.state.dono, 
-        creditos: this.state.creditos
+      if (this.state.creditos != '') {
+        const user = {
+          dono: this.state.dono, 
+          creditos: this.state.creditos
+        }
+        await api.post('reloads/new', qs.stringify(user)).then(resp => {
+                console.log('Recarga realizada.')
+            }).catch(error => {
+                console.log('Erro: ' + error)
+        })
       }
-      await api.post('reloads/new', qs.stringify(user)).then(resp => {
-              console.log('Recarga realizada.')
-          }).catch(error => {
-              console.log('Erro: ' + error)
-      })
 
       this.props.navigation.navigate('ReloadSuccess', { creditos: this.state.creditos })
     } catch (_err) {

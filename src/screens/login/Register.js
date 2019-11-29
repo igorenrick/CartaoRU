@@ -21,7 +21,8 @@ import {
   Text,
   TextInput,
   TouchableHighlight,
-  Switch
+  Switch,
+  Picker
 } from 'react-native';
 
 import api from '../../services/api'
@@ -97,12 +98,12 @@ const Register = ({ navigation }) => {
                 value={segundonome}
                 placeholder={"Sobrenome"}
             />
-            <TextInput
+            {/*<TextInput
                 style={styles.input}
                 onChangeText={curso => onChangeCurso(curso)}
                 value={curso}
                 placeholder={"Curso"}
-            />
+            />*/}
             <TextInput
                 style={styles.input}
                 onChangeText={senha => onChangeSenha(senha)}
@@ -110,6 +111,19 @@ const Register = ({ navigation }) => {
                 placeholder={"Senha"}
                 secureTextEntry={true}
             />
+
+            <Picker
+              selectedValue={curso}
+              style={{height: 50, width: screenWidth-80}}
+              onValueChange={(itemValue, itemIndex) =>
+                onChangeCurso(itemValue)
+              }>
+              <Picker.Item label="Engenharia de Computação" value="Engenharia de Computação" />
+              <Picker.Item label="Engenharia de Energia" value="Engenharia de Energia" />
+              <Picker.Item label="Fisioterapia" value="Fisioterapia" />
+              <Picker.Item label="Medicina" value="Medicina" />
+              <Picker.Item label="Tecnologia da Informação e Comunicação" value="Tecnologia da Informação e Comunicação" />
+            </Picker>
 
             <View style={{flexDirection: 'row', alignItems:'center'}}>
               <Text style={styles.rtxtb}>Não isento</Text>

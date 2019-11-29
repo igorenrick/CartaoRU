@@ -39,9 +39,9 @@ class ReloadSuccess extends Component {
         <StatusBar backgroundColor="#0A84FF"  barStyle="light-content" />
         <View style={styles.scrollView}>
 
-          <Text style={styles.titulo}>Pronto!</Text>
-
-          <Text style={styles.input}>Você carregou {this.state.creditos} créditos.</Text>
+          {navigation.getParam('creditos') == '' ? <Text style={styles.titulo}>Tente novamente.</Text>: <Text style={styles.titulo}>Pronto!</Text> } 
+          {console.log(navigation.getParam('creditos'))}
+          {navigation.getParam('creditos') == '' ? <Text style={styles.input}>É preciso informar um valor para recarregar.</Text> : <Text style={styles.input}>Você carregou {this.state.creditos} créditos.</Text>}
 
           <TouchableHighlight style={styles.button} underlayColor={'#83C1FF'} onPress={() => this.props.navigation.navigate('Home')}>
             <Text style={styles.text}>{"Obrigado."}</Text>
