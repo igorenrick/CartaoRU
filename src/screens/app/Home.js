@@ -165,7 +165,7 @@ class Home extends Component {
             <View style={{marginTop: 25}}>
               {this.state.erro ? <Text style={styles.erro}>{this.state.mensagem}</Text> : null}
               <View style={styles.botoesView}>
-                <TouchableHighlight style={styles.button} underlayColor={'#D1D1D6'} onPress={() => this.state.user.isento ? this.setState({ mensagem: 'Usuários isentos não podem transferir créditos.', erro: true}) : this.props.navigation.navigate('Transfer', { user: this.state.user})}>
+                <TouchableHighlight style={styles.button} underlayColor={'#D1D1D6'} onPress={() => this.state.user.isento ? this.setState({ mensagem: 'Usuários isentos não podem transferir créditos.', erro: true}) : this.props.navigation.navigate('Transfer', { user: this.state.user, creditosMax: this.state.cartao.creditos})}>
                   <View style={{alignItems: 'center'}}>
                     <Icon name="swap-horizontal" size={44} color={this.state.user.isento ? '#AEAEB2' :'#000'} />
                     <Text style={[styles.text, {color: this.state.user.isento ? '#AEAEB2' : '#000' }]}>{"Transferir"}</Text>

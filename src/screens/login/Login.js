@@ -37,8 +37,10 @@ const Login = ({ navigation }) => {
     const [error, onChangeError] = React.useState('')
     const [mensagem, onChangeMensagem] = React.useState(false)
 
-    handleSignInPress = async () => {      
+    handleSignInPress = async () => { 
+        console.log('TENTANDO LOGIN')     
         if (matricula === '' || senha === '') {
+          console.log('Falta de dados')
             onChangeError('Preencha ambos os campos antes de entrar.')
             onChangeMensagem(true)
         } else {
@@ -47,6 +49,7 @@ const Login = ({ navigation }) => {
                   matricula: matricula,
                   senha: senha,
                 })
+                console.log('Aqui')
 
                 onChangeMensagem(false)
 
@@ -58,7 +61,7 @@ const Login = ({ navigation }) => {
 
                 navigation.navigate('App')
             } catch (_err) {
-                onChangeError('Matrícula ou senha inválidos. Tente novamente. Erro: ' + _err)
+                onChangeError('Matrícula ou senha inválidos. Tente novamente.')
                 onChangeMensagem(true)
             }
         }
@@ -142,6 +145,8 @@ const styles = StyleSheet.create({
     color: '#FF453A',
     fontFamily: 'Roboto-Bold',
     fontSize: 14,
+    textAlign: 'center',
+    alignSelf: 'center'
   },
   viewr: {
     flexDirection: 'row',

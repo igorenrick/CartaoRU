@@ -58,6 +58,7 @@ const BottomNavig = createBottomTabNavigator(
     }
   },
   {
+    initialRouteName: 'Home',
     tabBarOptions: {
       activeTintColor: '#0A84FF',
       labelStyle: {

@@ -33,25 +33,36 @@ class TransferQntd extends Component {
       user: '',
       userDestino: '',
       creditos: '',
+      creditosMax: '',
+      erro: false,
+      mensagem: '',
     };
   }
 
   confirmTransfer = async () => {
     try {
-      if (this.state.creditos != '') {
-        const transferencia = {
-          usuarioDestino: this.state.userDestino,
-          usuarioOrigem: this.state.userOrigem,
-          creditos: this.state.creditos
-        }
+      console.log('MAX CREDITOS: ' + this.state.creditosMax + ' CREDITOS: ' + this.state.creditos)
+      if(this.state.creditos < this.state.creditosMax) {
+        if (this.state.creditos != '') {
+            console.log('NO IF')
+            const transferencia = {
+              usuarioDestino: this.state.userDestino,
+              usuarioOrigem: this.state.userOrigem,
+              creditos: this.state.creditos
+            }
 
-        await api.post('transfers/new', qs.stringify(transferencia)).then(res => {
-            this.props.navigation.navigate('TransferSuccess', {userDestino: this.state.userDestino, creditos: this.state.creditos})
-        }).catch(error => {
-            console.log('Erro: ' + error)
-        })
-      }
-      this.props.navigation.navigate('TransferSuccess', {userDestino: this.state.userDestino, creditos: this.state.creditos})
+            await api.post('transfers/new', qs.stringify(transferencia)).then(res => {
+                this.props.navigation.navigate('TransferSuccess', {userDestino: this.state.userDestino, creditos: this.state.creditos})
+            }).catch(error => {
+                console.log('Erro: ' + error)
+            })
+          
+        }
+        this.props.navigation.navigate('TransferSuccess', {userDestino: this.state.userDestino, creditos: this.state.creditos})
+    } else {
+      console.log('NO ELSE')
+      this.setState({erro: true, mensagem: 'Seu limite máximo para transferência é de ' + this.state.creditosMax + ' créditos. Recarregue para transferir outro valor.'})
+    }
     } catch (_err) {
       console.log(_err)
     }
@@ -61,6 +72,7 @@ class TransferQntd extends Component {
     const { navigation } = this.props;
     this.state.userDestino = navigation.getParam('userDestino', 'NO-USER')
     this.state.userOrigem = navigation.getParam('userOrigem', 'NO-USER')
+    this.state.creditosMax = navigation.getParam('creditosMax', 'NO-CREDIT')
     return (
       <>
         <StatusBar backgroundColor="#0A84FF"  barStyle="light-content" />
@@ -68,6 +80,8 @@ class TransferQntd extends Component {
 
           <Text style={styles.titulo}>Quantos créditos você deseja enviar para {this.state.userDestino.primeironome}?</Text>
 
+          {this.state.erro ? <Text style={styles.erro}>{this.state.mensagem}</Text> : null}
+          
           <TextInput
               style={styles.input}
               onChangeText={(creditos) => this.setState({creditos})}
@@ -125,6 +139,11 @@ const styles = StyleSheet.create({
     color: '#0A84FF',
     fontFamily: 'Roboto-Bold',
     fontSize: 14,
+  },
+  erro:{
+    color: '#fff',
+    fontFamily: 'Roboto-Light',
+    fontSize: 18,
   },
 });
 

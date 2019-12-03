@@ -17,7 +17,9 @@ import {
   Dimensions,
   TouchableHighlight,
   RefreshControl,
-  TextInput
+  TextInput,
+  Picker,
+  Switch
 } from 'react-native'
 
 const qs = require('qs')
@@ -37,6 +39,12 @@ class Perfil extends Component {
     this.state = {
       refreshing: false,
       user: '',
+      metricula: '',
+      primeironome: '',
+      segundonome: '',
+      senha : '000000',
+      isento: false,
+      curso: '',
       cartao: '',
       cardapio: '',
       erro: false,
@@ -58,6 +66,11 @@ class Perfil extends Component {
         console.log('Data: ' + res.data.cartao)
         res.data.senha = '000000'
         this.setState({ user: res.data })
+        this.setState({ matricula: res.data.matricula,
+                        primeironome: res.data.primeironome,
+                        segundonome: res.data.segundonome,
+                        curso: res.data.curso,
+                        isento: res.data.isento })
     }).catch(error => {
         console.log('Error: ' + error)
     })
@@ -90,6 +103,55 @@ class Perfil extends Component {
       }
   }
 
+  handleUpdatePress = async () => {
+    console.log('No Update.')
+    try {
+      const user = {
+        _id: this.state.user._id,
+        primeironome: this.state.primeironome,
+        segundonome: this.state.segundonome,
+        curso: this.state.curso,
+        matricula: this.state.matricula,
+        isento: this.state.isento
+      }
+
+      api.put('/users/me/update', qs.stringify(user)).then(resp => {
+        console.log('Atualização realizada. Veja: ' + resp)
+          }).catch(error => {
+              console.log(error)
+      })
+    } catch (_err) {
+      console.log(_err);
+    }
+  }
+
+  handleDeletePress = async () => {    
+    try {
+        console.log('Deletando usuário.')
+
+        const userToken = await AsyncStorage.getItem('userToken')
+
+        //AsyncStorage.removeItem('userToken')
+        
+        //const token = userToken.replace(/"/g, '')
+
+        //console.log('User token: ' + token)
+    
+        await api.delete('users/delete', {data: { dono: this.state.user }}).then(res => {
+            
+            console.log('Usuário deletado: ' + res.data )
+    
+        }).catch(error => {
+            console.log(error)
+        })
+
+        this.props.navigation.navigate('Login')
+
+    } catch (_err) {
+        this.setState({ error: 'Houve um problema com o logout, tente novamente.' });
+    }
+}
+
   _onRefresh() {
     this.setState({refreshing: true});
     this.componentDidMount().then(() => {
@@ -120,41 +182,60 @@ class Perfil extends Component {
               <View style={styles.view}>
                 <TextInput
                   style={styles.input}
-                  onChangeText={(matricula) => this.setState({user: { matricula }})}
-                  value={this.state.user.matricula}
+                  onChangeText={(matricula) => this.setState({matricula})}
+                  value={this.state.matricula}
                   placeholder={"Matrícula"}
                 />
 
                 <TextInput
                   style={styles.input}
-                  onChangeText={(primeironome) => this.setState({user: { primeironome }})}
-                  value={this.state.user.primeironome}
+                  onChangeText={(primeironome) => this.setState({primeironome})}
+                  value={this.state.primeironome}
                   placeholder={"Nome"}
                 />
 
                 <TextInput
                   style={styles.input}
-                  onChangeText={(segundonome) => this.setState({user: { segundonome }})}
-                  value={this.state.user.segundonome}
+                  onChangeText={(segundonome) => this.setState({segundonome})}
+                  value={this.state.segundonome}
                   placeholder={"Sobrenome"}
                 />
 
-                <TextInput
-                  style={styles.input}
-                  onChangeText={(senha) => this.setState({user: { senha }})}
-                  value={this.state.user.senha}
-                  placeholder={"Senha"}
-                  secureTextEntry={true}
-                />
+                <Picker
+                  selectedValue={this.state.user.curso}
+                  style={{height: 50, width: screenWidth-80, marginHorizontal: 40}}
+                  onValueChange={(itemValue, itemIndex) =>
+                    this.setState({ curso: itemValue })
+                  }>
+                  <Picker.Item label="Engenharia de Computação" value="Engenharia de Computação" />
+                  <Picker.Item label="Engenharia de Energia" value="Engenharia de Energia" />
+                  <Picker.Item label="Fisioterapia" value="Fisioterapia" />
+                  <Picker.Item label="Medicina" value="Medicina" />
+                  <Picker.Item label="Tecnologia da Informação e Comunicação" value="Tecnologia da Informação e Comunicação" />
+                </Picker>
 
-                <TouchableHighlight style={styles.button} underlayColor={'#0972DC'} onPress={ () => null }>
-                  <Icon name="checkbox-marked-circle-outline" size={24} color={'#FFF'} />
+                <View style={{flexDirection: 'row', alignItems:'center', alignSelf: 'center'}}>
+                  <Text style={styles.rtxtb}>Não isento</Text>
+                  <Switch
+                      style={styles.switch}
+                      onValueChange={isento => this.setState({isento})}
+                      value={this.state.isento}
+                      thumbColor={'#0A84FF'}
+                  />
+                  <Text style={styles.rtxtb}>Isento</Text>
+                </View>
+
+                <TouchableHighlight style={styles.button} underlayColor={'#0972DC'} onPress={ this.handleUpdatePress }>
+                  <View style={{flexDirection: 'row'}}>
+                    <Icon name="checkbox-marked-circle-outline" size={24} color={'#FFF'} />
+                    <Text style={[styles.text, {marginLeft: 10}]}>{"Salvar"}</Text>
+                  </View>
                 </TouchableHighlight>
               </View>
 
               <View style={[styles.view, { marginTop: 50}]}>
                 <Text style={[styles.tituloCardapio, {marginBottom: 5}]}>Outras ações</Text>
-                <TouchableHighlight style={styles.buttondelete} underlayColor={'#0972DC'} onPress={ () => null }>
+                <TouchableHighlight style={styles.buttondelete} underlayColor={'#0972DC'} onPress={ this.handleDeletePress }>
                   <Text style={styles.text}>{"Deletar conta"}</Text>
                 </TouchableHighlight>
                 <TouchableHighlight style={styles.button} underlayColor={'#0972DC'} onPress={this.handleSignOutPress}>
@@ -226,6 +307,15 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginLeft: 5
   },
+  rtxtb: {
+    fontFamily: 'Roboto-Bold',
+    fontSize: 14,
+    color: '#000',
+  },
+  switch: {
+    marginHorizontal: 20,
+    marginVertical: 10
+  }
 });
 
 export default Perfil;

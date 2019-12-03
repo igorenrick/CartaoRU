@@ -43,7 +43,7 @@ const Register = ({ navigation }) => {
 
     handleRegisterPress = async () => {      
         if (curso === '' || segundonome === '' || primeironome === '' || senha === '' || matricula === '') {
-            onChangeError('Preencha ambos os campos antes de entrar.')
+            onChangeError('Preencha todos os campos antes de entrar.')
             onChangeMensagem(true)
         } else {
             try {
@@ -118,6 +118,7 @@ const Register = ({ navigation }) => {
               onValueChange={(itemValue, itemIndex) =>
                 onChangeCurso(itemValue)
               }>
+              <Picker.Item label="Selecione o curso" value="Selecione o curso" />
               <Picker.Item label="Engenharia de Computação" value="Engenharia de Computação" />
               <Picker.Item label="Engenharia de Energia" value="Engenharia de Energia" />
               <Picker.Item label="Fisioterapia" value="Fisioterapia" />

@@ -85,8 +85,10 @@ class Card extends Component {
         console.log('Error: ' + error)
     })
 
+    //const local = this.state.usos[0].local == undefined ? '5ddc60a2154f630004c30fa7': this.state.usos[0].local
+
     const requestIdRestaurante = {
-      _id: this.state.usos[0].local,
+      _id: '5ddc60a2154f630004c30fa7',
     }
     await api.post('restaurants/find', qs.stringify(requestIdRestaurante)).then(res => {      
       console.log('Restaurante: ' + res.data.nome)        
@@ -211,7 +213,7 @@ class Card extends Component {
                 data={this.state.usos}
                 renderItem={({ item }) => (
                   <View style={{marginHorizontal: 20, marginTop: 5, marginBottom: 5}}>
-                    <Text style={{fontFamily: 'Roboto-Regular', fontSize: 12, color: '#8E8E93'}}>{moment(item.data).subtract(10, 'days').calendar()}</Text>
+                    <Text style={{fontFamily: 'Roboto-Regular', fontSize: 12, color: '#8E8E93'}}>{moment(item.data).subtract(10, 'days').calendar() + ' ' + moment(item.data).format('LT')}</Text>
                     <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
                       <Text>Uso no {this.state.localUsos}</Text>
                       <Text>{item.creditos > 1 ? item.creditos + ' créditos' : item.creditos + ' crédito'}</Text>
@@ -230,7 +232,7 @@ class Card extends Component {
                 data={this.state.recargas}
                 renderItem={({ item }) => (
                   <View style={{marginHorizontal: 20, marginTop: 5, marginBottom: 5}}>
-                    <Text style={{fontFamily: 'Roboto-Regular', fontSize: 12, color: '#8E8E93'}}>{moment(item.data).subtract(10, 'days').calendar()}</Text>
+                    <Text style={{fontFamily: 'Roboto-Regular', fontSize: 12, color: '#8E8E93'}}>{moment(item.data).subtract(10, 'days').calendar() + ' ' + moment(item.data).format('LT')}</Text>
                     <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
                       <Text>Recarga</Text>
                       <Text>{item.creditos > 1 ? item.creditos + ' créditos' : item.creditos + ' crédito'}</Text>
@@ -249,7 +251,7 @@ class Card extends Component {
                 data={this.state.transferencias}
                 renderItem={({ item }) => (
                   <View style={{marginHorizontal: 20, marginTop: 5, marginBottom: 5}}>
-                    <Text style={{fontFamily: 'Roboto-Regular', fontSize: 12, color: '#8E8E93'}}>{moment(item.data).subtract(10, 'days').calendar()}</Text>
+                    <Text style={{fontFamily: 'Roboto-Regular', fontSize: 12, color: '#8E8E93'}}>{moment(item.data).subtract(10, 'days').calendar() + ' ' + moment(item.data).format('LT')}</Text>
                     <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
                       <Text>Transferência para usuário</Text>
                       <Text>{item.creditos > 1 ? item.creditos + ' créditos' : item.creditos + ' crédito'}</Text>

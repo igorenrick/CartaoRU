@@ -33,7 +33,8 @@ class Transfer extends Component {
       userDestino: '',
       matriculaDestino: '',
       erro: false,
-      mensagem: ''
+      mensagem: '',
+      creditosMax: ''
     };
   }
 
@@ -52,7 +53,7 @@ class Transfer extends Component {
       })
       if(this.state.userDestino != '') {
           if(!this.state.userDestino.isento) {
-            this.props.navigation.navigate('TransferQntd', {userDestino: this.state.userDestino, userOrigem: this.state.user})
+            this.props.navigation.navigate('TransferQntd', {userDestino: this.state.userDestino, userOrigem: this.state.user, creditosMax: this.state.creditosMax})
           } else {
             this.setState({erro: true, mensagem: 'Não é possivel transferir créditos para usuários isentos.'})
           }
@@ -67,6 +68,7 @@ class Transfer extends Component {
   render() {
     const { navigation } = this.props;
     this.state.user = navigation.getParam('user', 'NO-USER')
+    this.state.creditosMax = navigation.getParam('creditosMax', 'NO-CREDIT')
     return (
       <>
         <StatusBar backgroundColor="#FFF"  barStyle="dark-content" />
